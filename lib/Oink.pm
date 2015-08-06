@@ -58,8 +58,6 @@ sub add_tasks {
 
   my $iter = path($dir)->iterator;
   while ( my $path = $iter->() ) {
-    use Data::Printer;
-    p $path->slurp;
     push @new_tasks, Oink::Task->new( %{ Load($path->slurp) } );
   }
 
