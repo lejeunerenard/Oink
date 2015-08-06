@@ -118,4 +118,16 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
+=over
+
+=item *
+
+L<Grunt|http://gruntjs.com/>
+
+=item *
+
+L<Test::Unit>
+
+=back
+
 =cut
