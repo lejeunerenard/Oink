@@ -1,5 +1,5 @@
 {
-   "abstract" : "Blah blah blah",
+   "abstract" : "Throwing perls before swine.",
    "author" : [
       "Sean Zellmer <sean@lejeunerenard.com>"
    ],
@@ -37,6 +37,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Capture::Tiny" : "0",
+            "Moo" : "0",
+            "Path::Tiny" : "0",
             "perl" : "5.008005"
          }
       },
@@ -47,6 +50,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lejeunerenard/Oink/issues"
+      },
+      "homepage" : "https://github.com/lejeunerenard/Oink",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lejeunerenard/Oink.git",
+         "web" : "https://github.com/lejeunerenard/Oink"
+      }
+   },
    "version" : "0.01"
 }
 

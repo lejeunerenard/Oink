@@ -1,14 +1,27 @@
 # NAME
 
-Oink - Blah blah blah
+Oink - Throwing perls before swine.
 
 # SYNOPSIS
 
     use Oink;
 
+    my $oink = Oink->new(@Args);
+    $oink->run;
+
 # DESCRIPTION
 
-Oink is
+Oink is a test runner. Throw them perls before swine and know whether they like them...
+
+# METHODS
+
+## run
+
+`run` will run the configured Oink instance with all it's plugins etc.
+
+## load\_tasks\_from\_dirs
+
+`load_tasks_from_dirs` will add all tasks from the objects `task_dirs` attribute.
 
 # AUTHOR
 
