@@ -12,65 +12,66 @@ use Oink::Task;
 use Moo;
 
 has task_dirs => (
-  is => 'rw',
-  isa => sub {
-    die 'task_dirs is not an array' unless ref $_[0] eq 'ARRAY';
-  },
-  coerce => sub {
-    unless ( ref $_[0] eq 'ARRAY' ) {
-      return [ $_[0] ];
-    }
-  },
-  default => sub {
-    [];
-  },
+    is  => 'rw',
+    isa => sub {
+        die 'task_dirs is not an array' unless ref $_[0] eq 'ARRAY';
+    },
+    coerce => sub {
+        unless ( ref $_[0] eq 'ARRAY' ) {
+            return [ $_[0] ];
+        }
+        return $_[0];
+    },
+    default => sub {
+        return [];
+    },
 );
 
 has tasks => (
-  is => 'rw',
-  default => sub {
-    [];
-  },
+    is      => 'rw',
+    default => sub {
+        [];
+    },
 );
 
 around 'new' => sub {
-  my $orig = shift;
-  my $self = $orig->(@_);
+    my $orig = shift;
+    my $self = $orig->(@_);
 
-  $self->load_tasks_from_dirs;
+    $self->load_tasks_from_dirs;
 
-  return $self;
+    return $self;
 };
 
 sub load_tasks_from_dirs {
-  my $self = shift;
+    my $self = shift;
 
-  foreach my $dir ( @{ $self->task_dirs } ) {
-    $self->add_tasks($dir);
-  }
+    foreach my $dir ( @{ $self->task_dirs } ) {
+        $self->add_tasks($dir);
+    }
 }
 
 sub add_tasks {
-  my $self = shift;
-  my $dir = shift;
+    my $self = shift;
+    my $dir  = shift;
 
-  my @new_tasks;
+    my @new_tasks;
 
-  my $iter = path($dir)->iterator;
-  while ( my $path = $iter->() ) {
-    push @new_tasks, Oink::Task->new( %{ Load($path->slurp) } );
-  }
+    my $iter = path($dir)->iterator;
+    while ( my $path = $iter->() ) {
+        push @new_tasks, Oink::Task->new( %{ Load( $path->slurp ) } );
+    }
 
-  $self->tasks( [ @{ $self->tasks }, @new_tasks ] );
-  return \@new_tasks;
+    $self->tasks( [ @{ $self->tasks }, @new_tasks ] );
+    return \@new_tasks;
 }
 
 sub run {
-  my $self = shift;
+    my $self = shift;
 
-  foreach my $task ( @{ $self->tasks } ) {
-    my ( $stdout, $stderr, $return ) = $task->run;
-  }
+    foreach my $task ( @{ $self->tasks } ) {
+        my ( $stdout, $stderr, $return ) = $task->run;
+    }
 }
 
 1;

@@ -5,30 +5,37 @@ use warnings;
 
 use Capture::Tiny 'capture';
 use Cwd;
+use File::Temp;
+use Git::Repository;
 
 use Moo;
 
 has dir => (
-  is => 'rw',
-  default => sub {
-    getcwd;
-  },
+    is      => 'rw',
+    default => sub {
+        getcwd;
+    },
 );
 
+has git_repo => ( is => 'rw', );
+
 has env_vars => (
-  is => 'rw',
-  isa => sub {
-    die 'env_vars must be a hashref' unless ref $_[0] eq 'HASH';
-  },
+    is  => 'rw',
+    isa => sub {
+        die 'env_vars must be a hashref' unless ref $_[0] eq 'HASH';
+    },
 );
 
 has command => (
-  is => 'rw',
-  required => 1,
+    is       => 'rw',
+    required => 1,
 );
 
 has args => (
-  is => 'rw',
+    is => 'rw',
+    default => sub {
+        [];
+    },
 );
 
 =head2 run
@@ -38,28 +45,43 @@ C<run> will well... run the task and return the STDOUT, STDERR and exit code, in
 =cut
 
 sub run {
-  my $self = shift;
+    my $self = shift;
 
-  use Data::Printer;
+    my $original_dir = getcwd;
+    my $repo;
+    my $git_dir;
 
-  my $original_dir = getcwd;
+    if ( $self->git_repo ) {
+        $git_dir = File::Temp->newdir;
 
-  chdir $self->dir;
+        Git::Repository->run( clone => $self->git_repo, $git_dir, );
+        $repo = Git::Repository->new( work_tree => $git_dir );
 
-  my %ENV_BEFORE = %ENV;
-
-  my ( $stdout, $stderr, $exit_code ) = capture {
-    if ( $self->env_vars ) {
-        %ENV = ( %ENV, %{ $self->env_vars } );
+        chdir $git_dir;
     }
-    system( $self->command, @{ $self->args }  );
-  };
+    else {
+        chdir $self->dir;
+    }
 
-  %ENV = %ENV_BEFORE;
+    my %ENV_BEFORE = %ENV;
 
-  chdir $original_dir;
+    my ( $stdout, $stderr, $exit_code ) = capture {
+        if ( $self->env_vars ) {
+            %ENV = ( %ENV, %{ $self->env_vars } );
+        }
+        system( $self->command, @{ $self->args } );
+    };
 
-  return ( $stdout, $stderr, $exit_code );
+    %ENV = %ENV_BEFORE;
+
+    if ( $self->git_repo ) {
+        chdir $original_dir;
+    }
+    else {
+        chdir $original_dir;
+    }
+
+    return ( $stdout, $stderr, $exit_code );
 }
 
 1;
