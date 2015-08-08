@@ -1,8 +1,9 @@
 use strict;
-use Test::More;
-use Oink;
+use warnings;
 
-# replace with the actual test
-ok 1;
+use Test::More;
+
+use_ok 'Oink';
+use_ok 'Oink::Task';
 
 done_testing;

@@ -20,9 +20,10 @@ has task_dirs => (
         unless ( ref $_[0] eq 'ARRAY' ) {
             return [ $_[0] ];
         }
+        return $_[0];
     },
     default => sub {
-        [];
+        return [];
     },
 );
 
