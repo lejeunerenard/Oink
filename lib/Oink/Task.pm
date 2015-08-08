@@ -9,27 +9,25 @@ use Cwd;
 use Moo;
 
 has dir => (
-  is => 'rw',
-  default => sub {
-    getcwd;
-  },
+    is      => 'rw',
+    default => sub {
+        getcwd;
+    },
 );
 
 has env_vars => (
-  is => 'rw',
-  isa => sub {
-    die 'env_vars must be a hashref' unless ref $_[0] eq 'HASH';
-  },
+    is  => 'rw',
+    isa => sub {
+        die 'env_vars must be a hashref' unless ref $_[0] eq 'HASH';
+    },
 );
 
 has command => (
-  is => 'rw',
-  required => 1,
+    is       => 'rw',
+    required => 1,
 );
 
-has args => (
-  is => 'rw',
-);
+has args => ( is => 'rw', );
 
 =head2 run
 
@@ -38,28 +36,27 @@ C<run> will well... run the task and return the STDOUT, STDERR and exit code, in
 =cut
 
 sub run {
-  my $self = shift;
+    my $self = shift;
 
-  use Data::Printer;
 
-  my $original_dir = getcwd;
+    my $original_dir = getcwd;
 
-  chdir $self->dir;
+    chdir $self->dir;
 
-  my %ENV_BEFORE = %ENV;
+    my %ENV_BEFORE = %ENV;
 
-  my ( $stdout, $stderr, $exit_code ) = capture {
-    if ( $self->env_vars ) {
-        %ENV = ( %ENV, %{ $self->env_vars } );
-    }
-    system( $self->command, @{ $self->args }  );
-  };
+    my ( $stdout, $stderr, $exit_code ) = capture {
+        if ( $self->env_vars ) {
+            %ENV = ( %ENV, %{ $self->env_vars } );
+        }
+        system( $self->command, @{ $self->args }  );
+    };
 
-  %ENV = %ENV_BEFORE;
+    %ENV = %ENV_BEFORE;
 
-  chdir $original_dir;
+    chdir $original_dir;
 
-  return ( $stdout, $stderr, $exit_code );
+    return ( $stdout, $stderr, $exit_code );
 }
 
 1;
