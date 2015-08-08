@@ -31,7 +31,12 @@ has command => (
     required => 1,
 );
 
-has args => ( is => 'rw', );
+has args => (
+    is => 'rw',
+    default => sub {
+        [];
+    },
+);
 
 =head2 run
 
