@@ -5,6 +5,8 @@ use warnings;
 
 use Capture::Tiny 'capture';
 use Cwd;
+use File::Temp;
+use Git::Repository;
 
 use Moo;
 
@@ -14,6 +16,8 @@ has dir => (
         getcwd;
     },
 );
+
+has git_repo => ( is => 'rw', );
 
 has env_vars => (
     is  => 'rw',
@@ -38,10 +42,21 @@ C<run> will well... run the task and return the STDOUT, STDERR and exit code, in
 sub run {
     my $self = shift;
 
-
     my $original_dir = getcwd;
+    my $repo;
+    my $git_dir;
 
-    chdir $self->dir;
+    if ( $self->git_repo ) {
+        $git_dir = File::Temp->newdir;
+
+        Git::Repository->run( clone => $self->git_repo, $git_dir, );
+        $repo = Git::Repository->new( work_tree => $git_dir );
+
+        chdir $git_dir;
+    }
+    else {
+        chdir $self->dir;
+    }
 
     my %ENV_BEFORE = %ENV;
 
@@ -49,12 +64,17 @@ sub run {
         if ( $self->env_vars ) {
             %ENV = ( %ENV, %{ $self->env_vars } );
         }
-        system( $self->command, @{ $self->args }  );
+        system( $self->command, @{ $self->args } );
     };
 
     %ENV = %ENV_BEFORE;
 
-    chdir $original_dir;
+    if ( $self->git_repo ) {
+        chdir $original_dir;
+    }
+    else {
+        chdir $original_dir;
+    }
 
     return ( $stdout, $stderr, $exit_code );
 }
